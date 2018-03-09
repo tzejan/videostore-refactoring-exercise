@@ -8,30 +8,29 @@ module.exports = function statement(customer, movies) {
   let rentalCustomer = new Customer(customer);
   let rentals = customer.rentals.map(
     rental =>
-      new Rental(
-        new Movie(
-          rental.movieID,
-          movies[rental.movieID].title,
-          movies[rental.movieID].code
-        ),
-        rental.days
-      )
+      new Rental({
+        movie: new Movie({
+          id: rental.movieID,
+          title: movies[rental.movieID].title,
+          code: movies[rental.movieID].code
+        }),
+        days: rental.days
+      })
   );
 
   let customerStatement = new StatementData(rentalCustomer.name);
 
-  for (let rentedMovie of customer.rentals) {
-    let movie = movies[rentedMovie.movieID];
+  for (let rental of rentals) {
     let thisAmount = appFn.calculateRentalAmountByMovieCode(
-      rentedMovie.days,
-      movie.code
+      rental.days,
+      rental.movie.code
     );
-    let movieItem = { title: movie.title, rentalCost: thisAmount };
+    let movieItem = { title: rental.movie.title, rentalCost: thisAmount };
     customerStatement.rentedMovies.push(movieItem);
 
     customerStatement.frequentRenterPoints += appFn.calculateFrequentRentalPoints(
-      movie.code,
-      rentedMovie.days
+      rental.movie.code,
+      rental.days
     );
   }
 
