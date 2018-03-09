@@ -1,44 +1,26 @@
+let appFn = require("./rental_functions");
+
 module.exports = function statement(customer, movies) {
-  let totalAmount = 0;
-  let frequentRenterPoints = 0;
-  let result = `Rental Record for ${customer.name}\n`;
-  for (let r of customer.rentals) {
-    let movie = movies[r.movieID];
-    let thisAmount = 0;
+  let customerStatement = {
+    frequentRenterPoints: 0,
+    customerName: customer.name,
+    rentedMovies: []
+  };
 
-    // determine amount for each movie
-    switch (movie.code) {
-      case "regular":
-        thisAmount = 2;
-        if (r.days > 2) {
-          thisAmount += (r.days - 2) * 1.5;
-        }
-        break;
-      case "new":
-        thisAmount = r.days * 3;
-        break;
-      case "children":
-        thisAmount = 1.5;
-        if (r.days > 3) {
-          thisAmount += (r.days - 3) * 1.5;
-        }
-        break;
-      default:
-        throw new Error("Invalid move type:" + movie.code);
-    }
+  for (let rentedMovie of customer.rentals) {
+    let movie = movies[rentedMovie.movieID];
+    let thisAmount = appFn.calculateRentalAmountByMovieCode(
+      rentedMovie.days,
+      movie.code
+    );
+    let movieItem = { title: movie.title, rentalCost: thisAmount };
+    customerStatement.rentedMovies.push(movieItem);
 
-    //add frequent renter points
-    frequentRenterPoints++;
-    // add bonus for a two day new release rental
-    if (movie.code === "new" && r.days > 2) frequentRenterPoints++;
-
-    //print figures for this rental
-    result += `\t${movie.title}\t${thisAmount}\n`;
-    totalAmount += thisAmount;
+    customerStatement.frequentRenterPoints += appFn.calculateFrequentRentalPoints(
+      movie.code,
+      rentedMovie.days
+    );
   }
-  // add footer lines
-  result += `Amount owed is ${totalAmount}\n`;
-  result += `You earned ${frequentRenterPoints} frequent renter points\n`;
 
-  return result;
-}
+  return appFn.formatStatement(customerStatement);
+};
