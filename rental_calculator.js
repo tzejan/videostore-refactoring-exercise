@@ -21,17 +21,11 @@ module.exports = function statement(customer, movies) {
   let customerStatement = new StatementData(rentalCustomer.name);
 
   for (let rental of rentals) {
-    let thisAmount = appFn.calculateRentalAmountByMovieCode(
-      rental.days,
-      rental.movie.code
-    );
+    let thisAmount = rental.calculateRentalCost();
     let movieItem = { title: rental.movie.title, rentalCost: thisAmount };
     customerStatement.rentedMovies.push(movieItem);
 
-    customerStatement.frequentRenterPoints += appFn.calculateFrequentRentalPoints(
-      rental.movie.code,
-      rental.days
-    );
+    customerStatement.frequentRenterPoints += rental.calculateRentalPoints();
   }
 
   return appFn.formatStatement(customerStatement);
