@@ -1,4 +1,3 @@
-let appFn = require("./rental_functions");
 let Movie = require("./Movie");
 let Customer = require("./Customer");
 let Rental = require("./Rental");
@@ -22,11 +21,9 @@ module.exports = function statement(customer, movies) {
 
   for (let rental of rentals) {
     let thisAmount = rental.calculateRentalCost();
-    let movieItem = { title: rental.movie.title, rentalCost: thisAmount };
-    customerStatement.rentedMovies.push(movieItem);
-
+    customerStatement.addMovieItem(rental.movie.title, thisAmount);
     customerStatement.frequentRenterPoints += rental.calculateRentalPoints();
   }
 
-  return appFn.formatStatement(customerStatement);
+  return customerStatement.getFormattedStatement();
 };
