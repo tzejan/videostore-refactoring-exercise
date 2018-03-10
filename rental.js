@@ -1,3 +1,5 @@
+var Movie = require("./Movie");
+
 const movieRates = {
   regular: { initialAmount: 2, freeDays: 2, dailyRate: 1.5 },
   new: { initialAmount: 0, freeDays: 0, dailyRate: 3 },
@@ -8,6 +10,20 @@ class Rental {
   constructor({ movie, days }) {
     this.movie = movie;
     this.days = days;
+  }
+
+  static createRentals(customer, movies) {
+    return customer.rentals.map(
+      rental =>
+        new Rental({
+          movie: new Movie({
+            id: rental.movieID,
+            title: movies[rental.movieID].title,
+            code: movies[rental.movieID].code
+          }),
+          days: rental.days
+        })
+    );
   }
 
   calculateRentalCost() {
